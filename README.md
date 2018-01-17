@@ -1,6 +1,6 @@
 # Islandora REST Client
 
-PHP library for building clients for Islandora's REST interfacei, using a simple pattern of applying CRUD (Create, Read, Update, Delete) operations to Islandora 7.x objects, relationships, and datastreams. Its goal is to hide the details of intreacting with a REST interface.
+PHP library for building clients for Islandora's REST interfacei, applying a simple pattern of CRUD (Create, Read, Update, Delete) operations to Islandora 7.x objects, relationships, and datastreams. Its goal is to hide the details of intreacting with a REST interface.
 
 Still in early development, please stay tuned.
 

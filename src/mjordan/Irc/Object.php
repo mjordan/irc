@@ -20,12 +20,27 @@ class Object
     private $client;
 
     /**
+     * @var bool
+     */
+    public $created = false;
+
+    /**
+     * @var bool
+     */
+    public $deleted = false;
+
+    /**
+     * @var bool
+     */
+    public $updated = false;
+
+    /**
      * @var string
      */
     public $pid;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct($client_defaults)
     {
@@ -33,13 +48,22 @@ class Object
         $this->client = new GuzzleClient($client_defaults);
     }
 
+    /**
+     * Retrieves an object via Islandora's REST interface.
+     *
+     * @param string $pid
+     *    The PID of the object.
+     *
+     * @return object
+     *    The Guzzle response.
+     */
     public function read($pid)
     {
         return $this->client->get('object/' . $pid);
     }
 
     /**
-     * Creates a new datastream via Islandora's REST interface.
+     * Creates a new object via Islandora's REST interface.
      *
      * @param string $namespace
      *    The namespace to use for the new object.
@@ -48,10 +72,10 @@ class Object
      * @param string $label
      *    The label to assign to the object.
      * @param string $cmodel
-     *    The object's content model. Additional content models need
+     *    The object's content model. Additional content models can
      *    to be assigned as separate Relationships.
      * @param string $parent
-     *    The object's parent. Additional parents need to be assigned
+     *    The object's parent. Additional parents can to be assigned
      *    as separate Relationships.
      *
      * @return object
@@ -59,7 +83,7 @@ class Object
      */
     public function create($namespace, $owner, $label, $cmodel = null, $parent = null)
     {
-        $object_response = $this->client->post('object', [
+        $response = $this->client->post('object', [
             'form_params' => [
                 'namespace' => $namespace,
                 'owner' => $owner,
@@ -70,10 +94,11 @@ class Object
             ]
         ]);
 
-        if ($object_response->getStatusCode() == 201) {
-            $object_response_array = json_decode((string) $object_response->getBody(), true);
+        if ($response->getStatusCode() == 201) {
+            $response_body = json_decode((string) $response->getBody());
 
-            $this->pid = $object_response_array['pid'];
+            $this->pid = $response_body->pid;
+            $this->created = true;
 
             // Assign a content model during object creation.
             if (!is_null($cmodel)) {
@@ -104,6 +129,42 @@ class Object
             }
         }
 
-        return $object_response;
+        return $response;
+    }
+
+    /**
+     * Deletes an object via Islandora's REST interface.
+     *
+     * @param string $pid
+     *    The PID of the object.
+     *
+     * @return object
+     *    The Guzzle response.
+     */
+    public function delete($pid)
+    {
+        // Delete it.
+        // if ($response->getStatusCode() == 200) {
+            // $this->deleted = true;
+        // }
+    }
+
+    /**
+     * Updates an object via Islandora's REST interface.
+     *
+     * @param string $namespace
+     *    The namespace to use for the new object.
+     * @param array $properties
+     *    An associative array of updated properties.
+     *
+     * @return object
+     *    The Guzzle response.
+     */
+    public function update($pid, $properties)
+    {
+        // Update it.
+        // if ($response->getStatusCode() == 200) {
+            // $this->updated = true;
+        // }
     }
 }
