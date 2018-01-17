@@ -63,7 +63,12 @@ class Datastream
      */
     public function read($pid, $dsid, $content = false, $version = null)
     {
-        return $this->client->get('object/' . $pid . '/datastream/' . $dsid);
+        try {
+            $response = $this->client->get('object/' . $pid . '/datastream/' . $dsid);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -85,29 +90,34 @@ class Datastream
     {
         $pathinfo = pathinfo($path);
 
-        // The base_uri is not being set here automatically as a Guzzle
-        // default. The headers are, however, and the base_uri is being
-        // set in the object client.
-        $response = $this->client->post($this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream', [
-            'multipart' => array(
-                [
-                    'name' => 'file',
-                    'filename' => $pathinfo['basename'],
-                    'contents' => fopen($path, 'r'),
-                ],
-                [
-                    'name' => 'dsid',
-                    'contents' => $dsid,
-                ],
-                [
-                    'name' => 'checksumType',
-                    'contents' => $checksum_type,
-                ],
-            ),
-            'headers' => [
-                'Accept' => 'application/json',
-            ]
-        ]);
+        try {
+            // The base_uri is not being set here automatically as a Guzzle
+            // default. The headers are, however, and the base_uri is being
+            // set in the object client.
+            $response = $this->client->post($this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream', [
+                'multipart' => array(
+                    [
+                        'name' => 'file',
+                        'filename' => $pathinfo['basename'],
+                        'contents' => fopen($path, 'r'),
+                    ],
+                    [
+                        'name' => 'dsid',
+                        'contents' => $dsid,
+                    ],
+                    [
+                        'name' => 'checksumType',
+                        'contents' => $checksum_type,
+                    ],
+                ),
+                'headers' => [
+                    'Accept' => 'application/json',
+                ]
+            ]);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
 
         if ($response->getStatusCode() == 201) {
             $this->created = true;

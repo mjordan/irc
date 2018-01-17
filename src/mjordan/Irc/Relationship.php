@@ -53,7 +53,12 @@ class Relationship
      */
     public function read($pid, $params)
     {
-        return $this->client->get('object/' . $pid . '/relationship/?');
+        try {
+            $response = $this->client->get('object/' . $pid . '/relationship/?');
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -71,20 +76,25 @@ class Relationship
      */
     public function create($pid, $params)
     {
-        // The base_uri is not being set here automatically as a Guzzle
-        // default. The headers are, however, and the base_uri is being
-        // set in the object client.
-        $response = $this->client->post($this->clientDefaults['base_uri'] . 'object/' . $pid . '/relationship', [
-            'form_params' => [
-                'uri' => $params['uri'],
-                'predicate' => $params['predicate'],
-                'object' => $params['object'],
-                'type' => $params['type'],
-            ],
-            'headers' => [
-                'Accept' => 'application/json',
-            ]
-        ]);
+        try {
+            // The base_uri is not being set here automatically as a Guzzle
+            // default. The headers are, however, and the base_uri is being
+            // set in the object client.
+            $response = $this->client->post($this->clientDefaults['base_uri'] . 'object/' . $pid . '/relationship', [
+                'form_params' => [
+                    'uri' => $params['uri'],
+                    'predicate' => $params['predicate'],
+                    'object' => $params['object'],
+                    'type' => $params['type'],
+                ],
+                'headers' => [
+                    'Accept' => 'application/json',
+                ]
+            ]);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
 
         if ($response->getStatusCode() == 201) {
             $this->created = true;
@@ -108,20 +118,25 @@ class Relationship
      */
     public function delete($pid, $params)
     {
-        // The base_uri is not being set here automatically as a Guzzle
-        // default. The headers are, however, and the base_uri is being
-        // set in the object client.
-        $response = $this->client->delete($this->clientDefaults['base_uri'] . 'object/' . $pid . '/relationship', [
-            'form_params' => [
-                'uri' => $params['uri'],
-                'predicate' => $params['predicate'],
-                'object' => $params['object'],
-                'type' => $params['type'],
-            ],
-            'headers' => [
-                'Accept' => 'application/json',
-            ]
-        ]);
+        try {
+            // The base_uri is not being set here automatically as a Guzzle
+            // default. The headers are, however, and the base_uri is being
+            // set in the object client.
+            $response = $this->client->delete($this->clientDefaults['base_uri'] . 'object/' . $pid . '/relationship', [
+                'form_params' => [
+                    'uri' => $params['uri'],
+                    'predicate' => $params['predicate'],
+                    'object' => $params['object'],
+                    'type' => $params['type'],
+                ],
+                'headers' => [
+                    'Accept' => 'application/json',
+                ]
+            ]);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
 
         if ($response->getStatusCode() == 200) {
             $this->deleted = true;

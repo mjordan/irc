@@ -59,7 +59,14 @@ class Object
      */
     public function read($pid)
     {
-        return $this->client->get('object/' . $pid);
+        try {
+            $response = $this->client->get('object/' . $pid);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $response;
     }
 
     /**
@@ -83,16 +90,21 @@ class Object
      */
     public function create($namespace, $owner, $label, $cmodel = null, $parent = null)
     {
-        $response = $this->client->post('object', [
-            'form_params' => [
-                'namespace' => $namespace,
-                'owner' => $owner,
-                'label' => $label,
-            ],
-            'headers' => [
-                'Accept' => 'application/json',
-            ]
-        ]);
+        try {
+            $response = $this->client->post('object', [
+                'form_params' => [
+                    'namespace' => $namespace,
+                    'owner' => $owner,
+                    'label' => $label,
+                ],
+                'headers' => [
+                    'Accept' => 'application/json',
+                ]
+            ]);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
 
         if ($response->getStatusCode() == 201) {
             $response_body = json_decode((string) $response->getBody());
