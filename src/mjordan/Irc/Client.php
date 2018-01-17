@@ -4,11 +4,10 @@ namespace mjordan\Irc;
 
 use GuzzleHttp\Client as GuzzleClient;
 
-
 /**
  * Islandora REST Client base class.
  */
-class Client 
+class Client
 {
     /**
      * Constructor
@@ -24,5 +23,3 @@ class Client
         return $this->guzzle->request('GET', $uri);
     }
 }
-
-

@@ -1,9 +1,22 @@
 {
+    "name": "mjordan/irc",
+    "license": "Unlicense",
+    "type": "library",
+    "homepage": "https://github.com/mjordan/irc",
+    "description": "PHP Library for building clients for Islandora's REST interface.",
+    "minimum-stability": "dev",
     "autoload": {
         "classmap": ["src"]
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer":"~2.3",
+        "phpunit/phpunit":"4.8.*"
     },
     "require": {
         "php": ">=5.5.0",
         "guzzlehttp/guzzle": "~6.0"
+    },
+    "scripts": {
+        "style": "./vendor/bin/phpcs --standard=PSR2 src"
     }
 }
