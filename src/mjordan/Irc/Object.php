@@ -10,6 +10,21 @@ use GuzzleHttp\Client as GuzzleClient;
 class Object
 {
     /**
+     * @var GuzzleClient
+     */
+    private $clientDefaults;
+
+    /**
+     * @var GuzzleClient
+     */
+    private $client;
+
+    /**
+     * @var string
+     */
+    public $pid;
+
+    /**
      * Constructor
      */
     public function __construct($client_defaults)

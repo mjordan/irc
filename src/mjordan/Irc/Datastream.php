@@ -10,6 +10,16 @@ use GuzzleHttp\Client as GuzzleClient;
 class Datastream
 {
     /**
+     * @var GuzzleClient
+     */
+    private $clientDefaults;
+
+    /**
+     * @var GuzzleClient
+     */
+    private $client;
+
+    /**
      * Constructor
      */
     public function __construct($client_defaults)

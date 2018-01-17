@@ -10,6 +10,16 @@ use GuzzleHttp\Client as GuzzleClient;
 class Relationship
 {
     /**
+     * @var GuzzleClient
+     */
+    private $clientDefaults;
+
+    /**
+     * @var GuzzleClient
+     */
+    private $client;
+
+    /**
      * Constructor
      */
     public function __construct($client_defaults)
