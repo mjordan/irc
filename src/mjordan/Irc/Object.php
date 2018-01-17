@@ -57,7 +57,8 @@ class Object
 
         if ($object_response->getStatusCode() == 201) {
             $object_response_array = json_decode((string) $object_response->getBody(), true);
-            $pid = $object_response_array['pid'];
+
+            $this->pid = $object_response_array['pid'];
 
             // Assign a content model during object creation.
             if (!is_null($cmodel)) {
@@ -70,7 +71,7 @@ class Object
 
                 // Use the object's clientDefaults to instantiate the relationship.
                 $relationship = new Relationship($this->clientDefaults);
-                $relationship->create($pid, $params);
+                $relationship->create($this->pid, $params);
             }
 
             // Assign a parent relationship during object creation.
@@ -84,7 +85,7 @@ class Object
 
                 // Use the object's clientDefaults to instantiate the relationship.
                 $relationship = new Relationship($this->clientDefaults);
-                $relationship->create($pid, $params);
+                $relationship->create($this->pid, $params);
             }
         }
 
