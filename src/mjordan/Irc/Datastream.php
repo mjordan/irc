@@ -139,30 +139,83 @@ class Datastream
      */
     public function delete($pid, $dsid)
     {
-        // Delete it.
-        // if ($response->getStatusCode() == 200) {
-            // $this->deleted = true;
-        // }
+        try {
+            $response = $this->client->delete($this->clientDefaults['base_uri'] .
+                'object/' . $pid . '/datastream/' . $dsid);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
+
+        if ($response->getStatusCode() == 200) {
+            $this->deleted = true;
+        }
+
+        return $response;
     }
 
     /**
      * Updates a datastream via Islandora's REST interface.
+     *
+     * As described in the Islandora REST module's README.md file,
+     * updates to datastream are actually performed via POST, with
+     * a special form-data field 'method' taking a value of PUT.
      *
      * @param string $namespace
      *    The namespace to use for the new object.
      * @param string $dsid
      *    The DSID of the datastream.
      * @param array $properties
-     *    An associative array of updated properties.
+     *    An associative array of (optional) updated properties
+     *    as described in the Islandora REST module's README.md file:
+     *    -label
+     *    -state
+     *    -mimeType
+     *    -checksumType
+     *    -versionable
      *
      * @return object
      *    The Guzzle response.
      */
-    public function update($pid, $dsid, $properties)
+    public function update($pid, $dsid, $path = null, $properties = array())
     {
-        // Update it.
-        // if ($response->getStatusCode() == 200) {
-            // $this->updated = true;
-        // }
+        // To mock PUT, as per the REST module's README.md file.
+        $multipart = array(
+            [
+            'name' => 'method',
+            'contents' => 'PUT',
+            ]
+        );
+
+        if (!is_null($path)) {
+            $pathinfo = pathinfo($path);
+            $multipart[] = array(
+                'name' => 'file',
+                'filename' => $pathinfo['basename'],
+                'contents' => fopen($path, 'r'),
+            );
+        }
+
+        try {
+            // The base_uri is not being set here automatically as a Guzzle
+            // default. The headers are, however, and the base_uri is being
+            // set in the object client.
+            $response = $this->client->post($this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream', [
+                'multipart' => $multipart,
+                'json' => $properties,
+                'headers' => [
+                    'Accept' => 'application/json',
+                ]
+            ]);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
+
+        if ($response->getStatusCode() == 200) {
+            $this->updated = true;
+        }
+
+        return $response;
     }
 }

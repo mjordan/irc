@@ -45,7 +45,12 @@ class Object
     public function __construct($client_defaults)
     {
         $this->clientDefaults = $client_defaults;
-        $this->client = new GuzzleClient($client_defaults);
+        try {
+            $this->client = new GuzzleClient($client_defaults);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -155,10 +160,18 @@ class Object
      */
     public function delete($pid)
     {
-        // Delete it.
-        // if ($response->getStatusCode() == 200) {
-            // $this->deleted = true;
-        // }
+        try {
+            $response = $this->client->delete($this->clientDefaults['base_uri'] . 'object/' . $pid);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
+
+        if ($response->getStatusCode() == 200) {
+            $this->deleted = true;
+        }
+
+        return $response;
     }
 
     /**
@@ -167,16 +180,32 @@ class Object
      * @param string $namespace
      *    The namespace to use for the new object.
      * @param array $properties
-     *    An associative array of updated properties.
+     *    An associative array of updated properties:
+     *    -label
+     *    -owner
+     *    -state
      *
      * @return object
      *    The Guzzle response.
      */
     public function update($pid, $properties)
     {
-        // Update it.
-        // if ($response->getStatusCode() == 200) {
-            // $this->updated = true;
-        // }
+        try {
+            $response = $this->client->put($this->clientDefaults['base_uri'] . 'object', [
+                'json' => $properties,
+                'headers' => [
+                    'Accept' => 'application/json',
+                ]
+            ]);
+        } catch (Exception $e) {
+            $response = isset($response) ?: null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
+
+        if ($response->getStatusCode() == 200) {
+            $this->updated = true;
+        }
+
+        return $response;
     }
 }

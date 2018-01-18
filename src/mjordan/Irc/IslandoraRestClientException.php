@@ -5,7 +5,7 @@ namespace mjordan\Irc;
 /**
  * Islandora REST Client Exception base class.
  */
-class IslandoraRestClientException extends Exception
+class IslandoraRestClientException extends \Exception
 {
     /**
      * Constructor.

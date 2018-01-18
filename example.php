@@ -11,7 +11,7 @@ $client_defaults = array(
 
 $object = new mjordan\Irc\Object($client_defaults);
 
-// Read an object. CRUD methods on objects return a Guzzle response object
+// Read an object. CRUD methods on objects return a Guzzle response object.
 $read_object_response = $object->read('restingester:collection');
 $read_response_code = $read_object_response->getStatusCode();
 $read_response_body = (string) $read_object_response->getBody();
@@ -34,3 +34,9 @@ $datastream = new mjordan\Irc\Datastream($client_defaults);
 $create_datastream_response = $datastream->create($object->pid, 'MODS', '/tmp/MODS.xml');
 echo "Datastream created: " . $create_datastream_response->getStatusCode() . "\n";
 echo $create_datastream_response_body = (string) $create_datastream_response->getBody();
+
+
+$del_object = new mjordan\Irc\Object($client_defaults);
+$response = $del_object->delete('rest:1316');
+var_dump($del_object->deleted);
+
