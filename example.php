@@ -2,8 +2,8 @@
 
 include 'vendor/autoload.php';
 
-// New objects, datastreams, and relationships need to pass in
-// Guzzle client defaults.
+// New objects, datastreams, relationships, and Solr queries need
+// to pass in Guzzle client defaults.
 $client_defaults = array(
     'base_uri' => 'http://localhost:8000/islandora/rest/v1/',
     'headers' => array('X-Authorization-User' => 'admin:admin'),
@@ -34,9 +34,3 @@ $datastream = new mjordan\Irc\Datastream($client_defaults);
 $create_datastream_response = $datastream->create($object->pid, 'MODS', '/tmp/MODS.xml');
 echo "Datastream created: " . $create_datastream_response->getStatusCode() . "\n";
 echo $create_datastream_response_body = (string) $create_datastream_response->getBody();
-
-
-$del_object = new mjordan\Irc\Object($client_defaults);
-$response = $del_object->delete('rest:1316');
-var_dump($del_object->deleted);
-

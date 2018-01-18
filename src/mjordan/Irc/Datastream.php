@@ -10,7 +10,7 @@ use GuzzleHttp\Client as GuzzleClient;
 class Datastream
 {
     /**
-     * @var GuzzleClient
+     * @var array
      */
     private $clientDefaults;
 

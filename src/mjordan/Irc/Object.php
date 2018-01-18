@@ -10,7 +10,7 @@ use GuzzleHttp\Client as GuzzleClient;
 class Object
 {
     /**
-     * @var GuzzleClient
+     * @var array
      */
     private $clientDefaults;
 

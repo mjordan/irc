@@ -1,8 +1,8 @@
 # Islandora REST Client
 
-PHP library for building clients for Islandora's REST interfacei, applying a simple pattern of CRUD (Create, Read, Update, Delete) operations to Islandora 7.x objects, relationships, and datastreams. Its goal is to hide the details of intreacting with a REST interface.
+PHP library for building clients for Islandora's REST interfacei, applying a simple pattern of CRUD (Create, Read, Update, Delete) operations to Islandora 7.x objects, relationships, and datastreams. Its goal is to hide the details of intreacting with a REST interface while providing access to the full HTTP responses.
 
-Still in early development, please stay tuned.
+Still in early development. Not for use in production yet.
 
 ## Requirements
 
@@ -59,6 +59,31 @@ $datastream = new mjordan\Irc\Datastream($client_defaults);
 $create_datastream_response = $datastream->create($object->pid, 'MODS', '/tmp/MODS.xml');
 echo "Datastream created: " . $create_datastream_response->getStatusCode() . "\n";
 echo $create_datastream_response_body = (string) $create_datastream_response->getBody();
+```
+
+## Querying Solr
+
+Doesn't use `->read()`, uses `->query()`. Also has `->numfound`, `->start`, and `->docs` properties.
+
+```php
+<?php
+
+include 'vendor/autoload.php';
+
+// New objects, datastreams, relationships, and Solr queries need
+// to pass in Guzzle client defaults.
+$client_defaults = array(
+    'base_uri' => 'http://localhost:8000/islandora/rest/v1/',
+    'headers' => array('X-Authorization-User' => 'admin:admin'),
+);
+
+// Query Solr.
+$solr = new mjordan\Irc\Solr($client_defaults);
+$solr_response = $solr->query('dc.title:testing?fl=PID');
+
+echo "NumFound: " . $solr->numFound . "\n";
+echo "Start: " . $solr->start . "\n";
+echo "Docs: "; var_dump($solr->docs) . "\n";
 ```
 
 ## Maintainer
