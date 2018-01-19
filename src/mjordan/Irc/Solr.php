@@ -3,6 +3,7 @@
 namespace mjordan\Irc;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Islandora REST Client Solr base class.
@@ -42,7 +43,7 @@ class Solr
         $this->clientDefaults = $client_defaults;
         try {
             $this->client = new GuzzleClient($client_defaults);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
@@ -61,7 +62,7 @@ class Solr
     {
         try {
             $response = $this->client->get('solr/' . $query);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }

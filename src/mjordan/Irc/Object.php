@@ -3,6 +3,7 @@
 namespace mjordan\Irc;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Islandora REST Client Object base class.
@@ -47,7 +48,7 @@ class Object
         $this->clientDefaults = $client_defaults;
         try {
             $this->client = new GuzzleClient($client_defaults);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
@@ -66,7 +67,7 @@ class Object
     {
         try {
             $response = $this->client->get('object/' . $pid);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
@@ -106,7 +107,7 @@ class Object
                     'Accept' => 'application/json',
                 ]
             ]);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
@@ -162,7 +163,7 @@ class Object
     {
         try {
             $response = $this->client->delete($this->clientDefaults['base_uri'] . 'object/' . $pid);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
@@ -191,13 +192,13 @@ class Object
     public function update($pid, $properties)
     {
         try {
-            $response = $this->client->put($this->clientDefaults['base_uri'] . 'object', [
-                'json' => $properties,
+            $response = $this->client->put($this->clientDefaults['base_uri'] . 'object/' . $pid, [
                 'headers' => [
                     'Accept' => 'application/json',
-                ]
+                ],
+                'json' => $properties,
             ]);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }

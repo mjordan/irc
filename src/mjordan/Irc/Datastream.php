@@ -3,6 +3,7 @@
 namespace mjordan\Irc;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Islandora REST Client Datastream base class.
@@ -65,7 +66,7 @@ class Datastream
     {
         try {
             $response = $this->client->get('object/' . $pid . '/datastream/' . $dsid);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
@@ -114,7 +115,7 @@ class Datastream
                     'Accept' => 'application/json',
                 ]
             ]);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
@@ -142,7 +143,7 @@ class Datastream
         try {
             $response = $this->client->delete($this->clientDefaults['base_uri'] .
                 'object/' . $pid . '/datastream/' . $dsid);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
@@ -207,7 +208,7 @@ class Datastream
                     'Accept' => 'application/json',
                 ]
             ]);
-        } catch (Exception $e) {
+        } catch (RequestException $e) {
             $response = isset($response) ?: null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
