@@ -49,7 +49,7 @@ class Object
         try {
             $this->client = new GuzzleClient($client_defaults);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -68,7 +68,7 @@ class Object
         try {
             $response = $this->client->get('object/' . $pid);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 
@@ -108,7 +108,7 @@ class Object
                 ]
             ]);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 
@@ -164,7 +164,7 @@ class Object
         try {
             $response = $this->client->delete($this->clientDefaults['base_uri'] . 'object/' . $pid);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 
@@ -199,7 +199,7 @@ class Object
                 'json' => $properties,
             ]);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 

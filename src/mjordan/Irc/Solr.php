@@ -44,7 +44,7 @@ class Solr
         try {
             $this->client = new GuzzleClient($client_defaults);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -63,7 +63,7 @@ class Solr
         try {
             $response = $this->client->get('solr/' . $query);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 

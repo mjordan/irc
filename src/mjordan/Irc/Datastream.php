@@ -36,6 +36,21 @@ class Datastream
     public $deleted = false;
 
     /**
+     * @var array
+     */
+    public $properties = array();
+
+    /**
+     * @var string
+     */
+    public $content = '';
+
+    /**
+     * @var string
+     */
+    public $mimeType = null;
+
+    /**
      * Constructor.
      */
     public function __construct($client_defaults)
@@ -62,14 +77,27 @@ class Datastream
      * @return object
      *    The Guzzle response.
      */
-    public function read($pid, $dsid, $content = false, $version = null)
+    public function read($pid, $dsid, $content = true, $version = null)
     {
+        $content_param = $content ? '' : '?content=false';
+        $version_param = is_null($version) ? '' : '&version=' . $version;
+
         try {
-            $response = $this->client->get('object/' . $pid . '/datastream/' . $dsid);
+            $response = $this->client->get($this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream/' .
+                $dsid . $content_param . $version_param);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
+
+        if ($content) {
+            $this->content = $response->getBody();
+            $this->mimeType = $response->getHeader('Content-Type');;
+        } else {
+            $this->properties = $response->getBody();
+        }
+
+        return $response;
     }
 
     /**
@@ -87,7 +115,7 @@ class Datastream
      * @return object
      *    The Guzzle response.
      */
-    public function create($pid, $dsid, $path, $checksum_type = 'DISABLED')
+    public function create($pid, $dsid, $path = null, $checksum_type = 'DISABLED')
     {
         $pathinfo = pathinfo($path);
 
@@ -116,7 +144,7 @@ class Datastream
                 ]
             ]);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 
@@ -144,7 +172,7 @@ class Datastream
             $response = $this->client->delete($this->clientDefaults['base_uri'] .
                 'object/' . $pid . '/datastream/' . $dsid);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 
@@ -159,13 +187,15 @@ class Datastream
      * Updates a datastream via Islandora's REST interface.
      *
      * As described in the Islandora REST module's README.md file,
-     * updates to datastream are actually performed via POST, with
-     * a special form-data field 'method' taking a value of PUT.
+     * updates to datastream's content are actually performed via
+     * POST, with a form-data field 'method' taking a value of 'PUT'.
      *
-     * @param string $namespace
-     *    The namespace to use for the new object.
+     * @param string $pid
+     *    The PID of the object to attach to datastream to.
      * @param string $dsid
      *    The DSID of the datastream.
+     * @param string $path
+     *    The full path to the file to use as the datastream's content.
      * @param array $properties
      *    An associative array of (optional) updated properties
      *    as described in the Islandora REST module's README.md file:
@@ -180,28 +210,35 @@ class Datastream
      */
     public function update($pid, $dsid, $path = null, $properties = array())
     {
-        // To mock PUT, as per the REST module's README.md file.
-        $multipart = array(
-            [
-            'name' => 'method',
-            'contents' => 'PUT',
-            ]
-        );
+        $verb = 'put';
+        $multipart = array();
+        $uri = $this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream/' . $dsid;
 
         if (!is_null($path)) {
+            $uri = $this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream/' . $dsid;
+            $verb = 'post';
             $pathinfo = pathinfo($path);
-            $multipart[] = array(
+            $multipart = array(
+                // To mock PUT, as per the REST module's README.md file.
+                [
+                'name' => 'method',
+                'contents' => 'PUT',
+                ],
+                [
+                'name' => 'dsid',
+                'contents' => $dsid,
+                ],
+                [
                 'name' => 'file',
                 'filename' => $pathinfo['basename'],
                 'contents' => fopen($path, 'r'),
+                ],
             );
         }
 
         try {
-            // The base_uri is not being set here automatically as a Guzzle
-            // default. The headers are, however, and the base_uri is being
-            // set in the object client.
-            $response = $this->client->post($this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream', [
+            $response = $this->client->{$verb}($uri,
+                [
                 'multipart' => $multipart,
                 'json' => $properties,
                 'headers' => [
@@ -209,7 +246,7 @@ class Datastream
                 ]
             ]);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 

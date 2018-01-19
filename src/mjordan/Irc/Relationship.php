@@ -73,7 +73,7 @@ class Relationship
             $response = $this->client->get($this->clientDefaults['base_uri'] . 'object/' .
                 $pid . '/relationship' . $get_params);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 
@@ -116,7 +116,7 @@ class Relationship
                 ]
             ]);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 
@@ -157,7 +157,7 @@ class Relationship
                 ]
             ]);
         } catch (RequestException $e) {
-            $response = isset($response) ?: null;
+            $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
         }
 
