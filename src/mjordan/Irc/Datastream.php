@@ -92,7 +92,7 @@ class Datastream
 
         if ($content) {
             $this->content = $response->getBody();
-            $this->mimeType = $response->getHeader('Content-Type');;
+            $this->mimeType = $response->getHeader('Content-Type');
         } else {
             $this->properties = $response->getBody();
         }
@@ -187,8 +187,8 @@ class Datastream
      * Updates a datastream via Islandora's REST interface.
      *
      * As described in the Islandora REST module's README.md file,
-     * updates to datastream's content are actually performed via
-     * POST, with a form-data field 'method' taking a value of 'PUT'.
+     * updates to datastream's content are performed via POST,
+     * with a form-data field 'method' taking a value of 'PUT'.
      *
      * @param string $pid
      *    The PID of the object to attach to datastream to.
@@ -210,41 +210,40 @@ class Datastream
      */
     public function update($pid, $dsid, $path = null, $properties = array())
     {
-        $verb = 'put';
-        $multipart = array();
         $uri = $this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream/' . $dsid;
-
-        if (!is_null($path)) {
-            $uri = $this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream/' . $dsid;
-            $verb = 'post';
-            $pathinfo = pathinfo($path);
-            $multipart = array(
-                // To mock PUT, as per the REST module's README.md file.
-                [
-                'name' => 'method',
-                'contents' => 'PUT',
-                ],
-                [
-                'name' => 'dsid',
-                'contents' => $dsid,
-                ],
-                [
-                'name' => 'file',
-                'filename' => $pathinfo['basename'],
-                'contents' => fopen($path, 'r'),
-                ],
-            );
-        }
-
         try {
-            $response = $this->client->{$verb}($uri,
-                [
-                'multipart' => $multipart,
-                'json' => $properties,
-                'headers' => [
-                    'Accept' => 'application/json',
-                ]
-            ]);
+            // We are updating properties: use straight-up PUT.
+            if (is_null($path)) {
+                $multipart = array();
+                $response = $this->client->put($uri, [
+                    'multipart' => $multipart,
+                    'json' => $properties,
+                    'headers' => array('Accept' => 'application/json'),
+                ]);
+            } else {
+                // We are updating content: mock PUT as described in
+                // the Islandora REST module's README file.
+                $pathinfo = pathinfo($path);
+                $multipart = array(
+                    [
+                    'name' => 'method',
+                    'contents' => 'PUT',
+                    ],
+                    [
+                    'name' => 'dsid',
+                    'contents' => $dsid,
+                    ],
+                    [
+                    'name' => 'file',
+                    'filename' => $pathinfo['basename'],
+                    'contents' => fopen($path, 'r'),
+                    ],
+                );
+                $response = $this->client->post($uri, [
+                    'multipart' => $multipart,
+                    'headers' => array('Accept' => 'application/json'),
+                ]);
+            }
         } catch (RequestException $e) {
             $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
