@@ -20,15 +20,22 @@ Still in early development. Not for use in production yet.
 1. `cd irc`
 1. `php composer.phar install` (or equivalent on your system, e.g., `./composer install`)
 
-## Example
+Or, use composer:
+
+```
+composer require mjordan/irc
+```
+
+## Examples
+
+### Objects
 
 ```php
+
 <?php
 
 include 'vendor/autoload.php';
 
-// New objects, datastreams, and relationships need to pass in
-// Guzzle client defaults.
 $client_defaults = array(
     'base_uri' => 'http://localhost:8000/islandora/rest/v1/',
     'headers' => array('X-Authorization-User' => 'admin:admin'),
@@ -36,13 +43,7 @@ $client_defaults = array(
 
 $object = new mjordan\Irc\Object($client_defaults);
 
-// Read an object. CRUD methods on objects return a Guzzle response object.
-$read_object_response = $object->read('restingester:collection');
-$read_response_code = $read_object_response->getStatusCode();
-$read_response_body = (string) $read_object_response->getBody();
-
-echo "The REST API replied with a repsonse of $read_response_code:\n";
-echo $read_response_body . "\n";
+// Read an object.
 
 // Create an object. When we create a new object, we can assign a content
 // model and parent. Newly created objects have a pid property, e.g., $object->pid,
@@ -51,17 +52,84 @@ $create_object_response = $object->create('rest', 'admin', "My new object", "isl
 echo "Object created: " . $create_object_response->getStatusCode() . "\n";
 echo $create_response_body = (string) $create_object_response->getBody();
 
-// If we wanted to create new relationships for the object, we could do so here.
-// CRUD methods on relationships return a Guzzle response object.
+// Update an object.
+$response = $object->update('rest:1320', array('owner' => 'mark'));
 
-// Create a datastream. CRUD methods on datastreams return a Guzzle response object.
-$datastream = new mjordan\Irc\Datastream($client_defaults);
-$create_datastream_response = $datastream->create($object->pid, 'MODS', '/tmp/MODS.xml');
-echo "Datastream created: " . $create_datastream_response->getStatusCode() . "\n";
-echo $create_datastream_response_body = (string) $create_datastream_response->getBody();
+// Delete an object.
+$response = $object->delete('rest:1320');
+var_dump($object->deleted);
+
+
+$response_code = $response->getStatusCode();
+var_dump($response_code);
+$response_body = (string) $response->getBody();
+var_dump($response_body);
 ```
 
-## Querying Solr
+### Relationships
+
+```php
+<?php
+
+include 'vendor/autoload.php';
+
+$client_defaults = array(
+    'base_uri' => 'http://localhost:8000/islandora/rest/v1/',
+    'headers' => array('X-Authorization-User' => 'admin:admin'),
+);
+
+$rel = new mjordan\Irc\Relationship($client_defaults);
+
+// Read.
+$response = $rel->read('rest:1321', array('predicate' => 'hasModel', 'uri' => 'info:fedora/fedora-system:def/model#'));
+
+// Create.
+// ?
+
+// Delete.
+$response = $rel->delete('rest:1321', array('predicate' => 'hasModel', 'uri' => 'info:fedora/fedora-system:def/model#'));
+
+$response_code = $response->getStatusCode();
+var_dump($response_code);
+$response_body = (string) $response->getBody();
+var_dump($response_body);
+```
+
+### Datastreams
+
+```php
+<?php
+
+include 'vendor/autoload.php';
+
+$client_defaults = array(
+    'base_uri' => 'http://localhost:8000/islandora/rest/v1/',
+    'headers' => array('X-Authorization-User' => 'admin:admin'),
+);
+
+$ds = new mjordan\Irc\Datastream($client_defaults);
+
+// Read.
+$response = $ds->read('rest:1322', 'MODS');
+
+// Create
+// ?
+
+// Delete
+$response = $ds->delete('rest:1321', 'MODS');
+
+// Update
+$response = $ds->update('rest:1322', 'MODS', '/tmp/MODSNEW.xml', array());
+$response = $ds->update('rest:1322', 'MODS', null, array('label' => 'Let us try that again.'));
+
+$response_code = $response->getStatusCode();
+var_dump($response_code);
+$response_body = (string) $response->getBody();
+var_dump($ds->mimeType);
+var_dump($response_body);
+```
+
+### Querying Solr
 
 Doesn't use `->read()`, uses `->query()`. Also has `->numfound`, `->start`, and `->docs` properties.
 

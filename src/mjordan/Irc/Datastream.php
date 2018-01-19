@@ -55,8 +55,14 @@ class Datastream
      */
     public function __construct($client_defaults)
     {
+        $client_defaults['http_errors'] = false;
         $this->clientDefaults = $client_defaults;
-        $this->client = new GuzzleClient($client_defaults);
+        try {
+            $this->client = new GuzzleClient($client_defaults);
+        } catch (RequestException $e) {
+            $response = isset($response) ? $response : null;
+            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**

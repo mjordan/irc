@@ -40,6 +40,7 @@ class Solr
      */
     public function __construct($client_defaults)
     {
+        $client_defaults['http_errors'] = false;
         $this->clientDefaults = $client_defaults;
         try {
             $this->client = new GuzzleClient($client_defaults);
