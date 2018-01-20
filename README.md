@@ -1,14 +1,14 @@
 # Islandora REST Client
 
-PHP library for building clients for Islandora's REST interfacei, applying a simple pattern of CRUD (Create, Read, Update, Delete) operations to Islandora 7.x objects, relationships, and datastreams. Its goal is to hide the details of intreacting with a REST interface while providing access to the full HTTP responses.
+PHP library for building clients for Islandora's REST interface, applying a simple pattern of CRUD (Create, Read, Update, Delete) operations to Islandora 7.x objects, relationships, and datastreams. Also provides access to the Islandora REST module's Solr endpoint. The library's goal is to hide the details of intreacting with a REST interface while providing access to the full HTTP responses.
 
-Still in early development. Not for use in production yet.
+Still in early development. Not for use in production yet. Testers welcome.
 
 ## Requirements
 
 * On the target Islandora instance
   * [Islandora REST](https://github.com/discoverygarden/islandora_rest)
-  * [Islandora REST Authen](https://github.com/mjordan/islandora_rest_authen)
+  * Optionally, [Islandora REST Authen](https://github.com/mjordan/islandora_rest_authen)
   * Optionally, [Islandora REST Extras](https://github.com/mjordan/islandora_rest_extras) (see "Generating DC XML" below for more information).
 * On the system where the script is run
   * PHP 5.5.0 or higher.
@@ -30,7 +30,25 @@ composer require mjordan/irc
 
 Islandora objects, relationships, and datastreams are instantiated using a set of client defaults. In general, you only need to provide a default `base_uri` and any headers you need, e.g. for authentication. For most requests, the appropriate `Content-Type` headers are provided for you. Guzzle's `http_errors` request optin is always set to `false`.
 
-Object and datastreams provide `read()`, `create()`, `delete()`, and `update()` methods; relationships provide `read()`, `create()`, and `delete()` methods. In all cases, the method returns a Guzzle response object. Objects, relationships, and datastream objects have convenience propteries that you can use to check the success of the various methods (e.g., `->created`, `-deleted`) are illustrated in the examples below.
+```php
+<?php
+include 'vendor/autoload.php';
+
+$client_defaults = array(
+    'base_uri' => 'ihttp://localhost:8000/islandora/rest/v1/',
+    'headers' => array('X-Authorization-User' => 'admin:admin'),
+);
+
+$islandora_object = new mjordan\Irc\Object($client_defaults);
+$relationship = new mjordan\Irc\Relationship($client_defaults);
+$object = new mjordan\Irc\Datastream($client_defaults);
+```
+
+Islandora object and datastreams provide `read()`, `create()`, `delete()`, and `update()` methods; relationships provide `read()`, `create()`, and `delete()` methods. In all cases, these methods returns a Guzzle response object. However, object, relationship, and datastream objects provide convenience propteries that you can use to check the success of the various methods (e.g., `->created`, `-deleted`) are illustrated in the examples below.
+
+## Authentication
+
+Since you can pass in arbitrary request headers, you can use any authentication method that is possible through the use of headers. The [Islandora REST Authen](https://github.com/mjordan/islandora_rest_authen) module provides a convenient way to use a single `'X-Authorization-User` request header to authenticate REST requests. The examples below use this header.
 
 ## Examples
 
@@ -51,7 +69,7 @@ $object = new mjordan\Irc\Object($client_defaults);
 // Read an object. CRUD methods on objects return a Guzzle response object.
 $response = $object->read('islandora:100');
 
-// Create an object. When we create a new object, we can assign a content
+// Create an object. When we create a new object, we can optionally assign a content
 // model and parent. Newly created objects have a pid property, e.g., $object->pid,
 // which can be used to add relationships or datastreams.
 $response = $object->create('islandora', 'admin', "My new object", "islandora:sp_basic_image", "islandora:testcollection");
@@ -135,7 +153,7 @@ $response = $ds->create(
 	$object->pid,
 	'MODS',
 	'/tmp/MODS.xml',
-	array('owner' => 'admin', 'label' => 'I am a new MODS document')
+	array('label' => 'I am a new MODS document')
 );
 // True if successfully created, false if not.
 var_dump($ds->created);
