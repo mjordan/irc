@@ -28,7 +28,12 @@ class Datastream
     /**
      * @var bool
      */
-    public $updated = false;
+    public $propertiesUpdated = false;
+
+    /**
+     * @var bool
+     */
+    public $contentUpdated = false;
 
     /**
      * @var bool
@@ -115,36 +120,46 @@ class Datastream
      *    The DSID of the datastream.
      * @param string $path
      *    The full path to the file to use as the datastream's content.
-     * @param string $checksum_type
-     *    The checksum type, e.g. SHA-1.
+     * @param array $properties
+     *    An associative array of (optional) updated properties
+     *    as described in the Islandora REST module's README.md file:
+     *    -label (optional)
+     *    -state (optional, defaults to 'A')
+     *    -mimeType (optional, is guessed from uploaded file.
+     *    -controlGroup (X, M, E, R)
+     *    -checksumType (optional, defaults to 'DISABLED')
+     *    -versionable (optional, defaults to true)
      *
      * @return object
      *    The Guzzle response.
      */
-    public function create($pid, $dsid, $path = null, $checksum_type = 'DISABLED')
+    public function create($pid, $dsid, $path = null, $properties = array())
     {
-        $pathinfo = pathinfo($path);
+        $ds_props = array('label', 'state', 'mimeType', 'controlGroup', 'checksumType',
+            'versionalble');
+        $multipart = array(array('name' => 'dsid', 'contents' => $dsid));
+        foreach ($ds_props as $prop) {
+            if (array_key_exists($prop, $properties)) {
+                $multipart[] = array('name' => $prop, 'contents' => $properties[$prop]);
+            }
+        }
+        if (file_exists($path)) {
+            $pathinfo = pathinfo($path);
+            $multipart[] = array(
+                'name' => 'file',
+                'filename' => $pathinfo['basename'],
+                'contents' => fopen($path, 'r')
+            );
+        } else {
+            throw new IslandoraRestClientException(null, "Datastream content file $path cannot be found", 1);
+        }
 
         try {
             // The base_uri is not being set here automatically as a Guzzle
             // default. The headers are, however, and the base_uri is being
             // set in the object client.
             $response = $this->client->post($this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream', [
-                'multipart' => array(
-                    [
-                        'name' => 'file',
-                        'filename' => $pathinfo['basename'],
-                        'contents' => fopen($path, 'r'),
-                    ],
-                    [
-                        'name' => 'dsid',
-                        'contents' => $dsid,
-                    ],
-                    [
-                        'name' => 'checksumType',
-                        'contents' => $checksum_type,
-                    ],
-                ),
+                'multipart' => $multipart,
                 'headers' => [
                     'Accept' => 'application/json',
                 ]
@@ -217,46 +232,62 @@ class Datastream
     public function update($pid, $dsid, $path = null, $properties = array())
     {
         $uri = $this->clientDefaults['base_uri'] . 'object/' . $pid . '/datastream/' . $dsid;
-        try {
-            // We are updating properties: use straight-up PUT.
-            if (is_null($path)) {
+
+        if (count($properties)) {
+            try {
+                // We are updating properties: use straight-up PUT.
                 $multipart = array();
                 $response = $this->client->put($uri, [
                     'multipart' => $multipart,
                     'json' => $properties,
                     'headers' => array('Accept' => 'application/json'),
                 ]);
-            } else {
-                // We are updating content: mock PUT as described in
-                // the Islandora REST module's README file.
-                $pathinfo = pathinfo($path);
-                $multipart = array(
-                    [
-                    'name' => 'method',
-                    'contents' => 'PUT',
-                    ],
-                    [
-                    'name' => 'dsid',
-                    'contents' => $dsid,
-                    ],
-                    [
-                    'name' => 'file',
-                    'filename' => $pathinfo['basename'],
-                    'contents' => fopen($path, 'r'),
-                    ],
-                );
-                $response = $this->client->post($uri, [
-                    'multipart' => $multipart,
-                    'headers' => array('Accept' => 'application/json'),
-                ]);
+            } catch (RequestException $e) {
+                $response = isset($response) ? $response : null;
+                throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
             }
-        } catch (RequestException $e) {
-            $response = isset($response) ? $response : null;
-            throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+
+            if ($response->getStatusCode() == 200) {
+                $this->propertiesUpdated = true;
+            }
         }
 
-        if ($response->getStatusCode() == 200) {
-            $this->updated = true;
+        if (!is_null($path)) {
+            if (file_exists($path)) {
+                try {
+                    // We are updating content: mock PUT as described
+                    // in the Islandora REST module's README file.
+                    $pathinfo = pathinfo($path);
+                    $multipart = array(
+                        [
+                        'name' => 'method',
+                        'contents' => 'PUT',
+                        ],
+                        [
+                        'name' => 'dsid',
+                        'contents' => $dsid,
+                        ],
+                        [
+                        'name' => 'file',
+                        'filename' => $pathinfo['basename'],
+                        'contents' => fopen($path, 'r'),
+                        ],
+                    );
+                    $response = $this->client->post($uri, [
+                        'multipart' => $multipart,
+                        'headers' => array('Accept' => 'application/json'),
+                    ]);
+                } catch (RequestException $e) {
+                    $response = isset($response) ? $response : null;
+                    throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);
+                }
+
+                if ($response->getStatusCode() == 200) {
+                    $this->contentUpdated = true;
+                }
+            } else {
+                throw new IslandoraRestClientException(null, "Datastream content file $path cannot be found", 1);
+            }
         }
 
         return $response;

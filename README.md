@@ -26,40 +26,49 @@ Or, use composer:
 composer require mjordan/irc
 ```
 
+## Usage
+
+Islandora objects, relationships, and datastreams are instantiated using a set of client defaults. In general, you only need to provide a default `base_uri` and any headers you need, e.g. for authentication. For most requests, the appropriate `Content-Type` headers are provided for you. Guzzle's `http_errors` request optin is always set to `false`.
+
+Object and datastreams provide `read()`, `create()`, `delete()`, and `update()` methods; relationships provide `read()`, `create()`, and `delete()` methods. In all cases, the method returns a Guzzle response object. Objects, relationships, and datastream objects have convenience propteries that you can use to check the success of the various methods (e.g., `->created`, `-deleted`) are illustrated in the examples below.
+
 ## Examples
 
 ### Objects
 
 ```php
-
 <?php
 
 include 'vendor/autoload.php';
 
 $client_defaults = array(
-    'base_uri' => 'http://localhost:8000/islandora/rest/v1/',
+    'base_uri' => 'ihttp://localhost:8000/islandora/rest/v1/',
     'headers' => array('X-Authorization-User' => 'admin:admin'),
 );
 
 $object = new mjordan\Irc\Object($client_defaults);
 
-// Read an object.
+// Read an object. CRUD methods on objects return a Guzzle response object.
+$response = $object->read('islandora:100');
 
 // Create an object. When we create a new object, we can assign a content
 // model and parent. Newly created objects have a pid property, e.g., $object->pid,
 // which can be used to add relationships or datastreams.
-$create_object_response = $object->create('rest', 'admin', "My new object", "islandora:sp_basic_image", "restingester:collection");
-echo "Object created: " . $create_object_response->getStatusCode() . "\n";
-echo $create_response_body = (string) $create_object_response->getBody();
+$response = $object->create('islandora', 'admin', "My new object", "islandora:sp_basic_image", "islandora:testcollection");
+// True if successfully created, false if not.
+var_dump($object->created);
 
 // Update an object.
-$response = $object->update('rest:1320', array('owner' => 'mark'));
+$response = $object->update('islandora:150', array('owner' => 'mark'));
+// True if successfully updated, false if not.
+var_dump($object->updated);
 
 // Delete an object.
-$response = $object->delete('rest:1320');
+$response = $object->delete('islandora:200');
+// True if successfully deleted, false if not.
 var_dump($object->deleted);
 
-
+// For read(), create(), update(), and delete().
 $response_code = $response->getStatusCode();
 var_dump($response_code);
 $response_body = (string) $response->getBody();
@@ -80,15 +89,26 @@ $client_defaults = array(
 
 $rel = new mjordan\Irc\Relationship($client_defaults);
 
-// Read.
-$response = $rel->read('rest:1321', array('predicate' => 'hasModel', 'uri' => 'info:fedora/fedora-system:def/model#'));
+$response = $rel->read('islandora:123', array('predicate' => 'hasModel', 'uri' => 'info:fedora/fedora-system:def/model#'));
 
-// Create.
-// ?
+// Create a relationship.
+$params = array(
+    'uri' => 'info:fedora/fedora-system:def/relations-external#',
+    'predicate' => 'isMemberOfCollection',
+    'object' => $parent_pid,
+    'type' => 'uri',
+);
 
-// Delete.
-$response = $rel->delete('rest:1321', array('predicate' => 'hasModel', 'uri' => 'info:fedora/fedora-system:def/model#'));
+$rel = new Relationship($this->clientDefaults);
+$response->create('islandora:456', $params);
+// True if successfully created, false if not.
+var_dump($rel->created);
 
+$response = $rel->delete('islandora:789', array('predicate' => 'hasModel', 'uri' => 'info:fedora/fedora-system:def/model#'));
+// True if successfully deleted, false if not.
+var_dump($rel->deleted);
+
+// For read(), create(), and delete().
 $response_code = $response->getStatusCode();
 var_dump($response_code);
 $response_body = (string) $response->getBody();
@@ -109,29 +129,37 @@ $client_defaults = array(
 
 $ds = new mjordan\Irc\Datastream($client_defaults);
 
-// Read.
-$response = $ds->read('rest:1322', 'MODS');
+$response = $ds->read('islandora:100', 'MODS');
 
-// Create
-// ?
+$response = $ds->create(
+	$object->pid,
+	'MODS',
+	'/tmp/MODS.xml',
+	array('owner' => 'admin', 'label' => 'I am a new MODS document')
+);
+// True if successfully created, false if not.
+var_dump($ds->created);
 
-// Delete
-$response = $ds->delete('rest:1321', 'MODS');
+$response = $ds->delete('islandora:100', 'MODS');
+var_dump($ds->deleted);
+// True if successfully deleted, false if not.
+var_dump($ds->deleted);
 
-// Update
-$response = $ds->update('rest:1322', 'MODS', '/tmp/MODSNEW.xml', array());
-$response = $ds->update('rest:1322', 'MODS', null, array('label' => 'Let us try that again.'));
+$response = $ds->update('rest:1322', 'MODS', '/tmp/MODSNEW.xml', array('label' => 'Let us try that again.'));
+// These two properties are true if successfully updated, false if not.
+var_dump($ds->propertiesUpdated);
+var_dump($ds->contentUpdated);
 
+// For read(), create(), update(), and delete().
 $response_code = $response->getStatusCode();
 var_dump($response_code);
 $response_body = (string) $response->getBody();
-var_dump($ds->mimeType);
 var_dump($response_body);
 ```
 
 ### Querying Solr
 
-Doesn't use `->read()`, uses `->query()`. Also has `->numfound`, `->start`, and `->docs` properties.
+Solr objects don't provide a `->read()` method, they provide`->query()`, which should contain a raw Solr query string. They also provide convenience properties`->numfound`, `->start`, and `->docs`, which provide direct access to those parts of the raw Solr response.
 
 ```php
 <?php
@@ -160,7 +188,7 @@ echo "Docs: "; var_dump($solr->docs) . "\n";
 
 ## Development and feedback
 
-Still in very early development. Once it's past the proof of concept stage, I'd be happy to take PRs, etc.
+Still in development. Once it's past the proof of concept stage, I'd be happy to take PRs, etc.
 
 ## License
 
