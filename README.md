@@ -26,6 +26,14 @@ Or, use composer:
 composer require mjordan/irc
 ```
 
+and within a composer.json file:
+
+```javascript
+    "require": {
+        "mjordan/irc": "dev-master"
+    }
+```
+
 ## Usage
 
 Islandora objects, relationships, and datastreams are instantiated using a set of client defaults. In general, you only need to provide a default `base_uri` and any headers you need, e.g. for authentication. For most requests, the appropriate `Content-Type` headers are provided for you. Guzzle's `http_errors` request optin is always set to `false`.
