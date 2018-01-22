@@ -17,7 +17,7 @@ class TestServer
         $this->process = new BackgroundProcess('php -S localhost:' . $port . ' ' . __DIR__ . '/index.php');
         $this->process->run();
         $this->processId = $this->process->getPid();
-        sleep(3);
+        sleep(5);
     }
 
     public function __destruct()

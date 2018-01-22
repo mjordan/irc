@@ -19,6 +19,6 @@
     },
     "scripts": {
         "tests": "./vendor/bin/phpunit tests",
-        "style": "./vendor/bin/phpcs --standard=PSR2 src"
+        "style": "./vendor/bin/phpcs --standard=PSR2 --ignore=index.php src tests"
     }
 }
