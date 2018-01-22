@@ -67,7 +67,7 @@ class Object
     public function read($pid)
     {
         try {
-            $response = $this->client->get('object/' . $pid);
+            $response = $this->client->get($this->clientDefaults['base_uri'] . 'object/' . $pid);
         } catch (RequestException $e) {
             $response = isset($response) ? $response : null;
             throw new IslandoraRestClientException($response, $e->getMessage(), $e->getCode(), $e);

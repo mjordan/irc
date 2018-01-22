@@ -16,5 +16,10 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     public function testRead() {
         $islandora_object = new \mjordan\Irc\Object($this->client_defaults);
         $response = $islandora_object->read('test:pid');
+        $response_body = (string) $response->getBody();
+        $response_body = json_decode($response_body, true);
+
+        $this->assertEquals('fedoraAdmin', $response_body['owner']);
+
     }
 }
