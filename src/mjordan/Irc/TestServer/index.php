@@ -13,11 +13,39 @@ $post_data = $_POST;
 $put_data = file_get_contents('php://input');
 
 // Request is for relationships.
-if (preg_match('#/islandora/rest/v1/object/.*/relationship#', $request_uri)) {
+if (preg_match('#/islandora/rest/v1/object/.*/relationship.*#', $request_uri)) {
+    switch ($method) {
+        case 'GET':
+            relationship_read();
+            exit();
+        case 'POST':
+            relationship_create();
+            exit;
+        case 'PUT':
+            relationship_update();
+            exit;
+        case 'DELETE':
+            relationship_delete();
+            exit;
+    }
 }
 
 // Request is for datastreams.
-if (preg_match('#/islandora/rest/v1/object/.*/datastream#', $request_uri)) {
+if (preg_match('#/islandora/rest/v1/object/.*/datastream.*#', $request_uri)) {
+    switch ($method) {
+        case 'GET':
+            datastream_read();
+            exit;
+        case 'POST':
+            datastream_create();
+            exit;
+        case 'PUT':
+            datastream_update();
+            exit;
+        case 'DELETE':
+            datastream_delete();
+            exit;
+    }
 }
 
 // Request is for objects.
@@ -25,16 +53,16 @@ if (preg_match('#/islandora/rest/v1/object.*#', $request_uri)) {
     switch ($method) {
         case 'GET':
             object_read();
-            break;
+            exit;
         case 'POST':
             object_create();
-            break;
+            exit;
         case 'PUT':
             object_update();
-            break;
+            exit;
         case 'DELETE':
             object_delete();
-            break;
+            exit;
     }
 }
 
@@ -167,7 +195,39 @@ print <<< END
 END;
 }
 
+function datastream_read()
+{
+    header("Content-Type: text/xml");
 
+print <<< END
+<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <titleInfo>
+    <title>Test MODS document.</title>
+  </titleInfo>
+</mods>
+END;
+}
+
+function relationship_read()
+{
+    header("Content-Type: application/json");
+
+print <<< END
+[
+   {
+      "predicate":{
+         "value":"hasModel",
+         "alias":"fedora-model",
+         "namespace":"info:fedora\/fedora-system:def\/model#"
+      },
+      "object":{
+         "literal":false,
+         "value":"islandora:sp_basic_image"
+      }
+   }
+]
+END;
+}
 
 // for use during development.
 function dump($variable, $label = null, $destination = null)

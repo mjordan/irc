@@ -28,8 +28,6 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     {
         $islandora_object = new \mjordan\Irc\Object($this->client_defaults);
         $response = $islandora_object->create('test', 'admin', 'A label');
-        // $response_body = (string) $response->getBody();
-        // $response_body = json_decode($response_body, true);
 
         $this->assertEquals(201, $response->getStatusCode());
         $this->assertTrue($islandora_object->created);
@@ -39,8 +37,6 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     {
         $islandora_object = new \mjordan\Irc\Object($this->client_defaults);
         $response = $islandora_object->delete('islandora:test');
-        // $response_body = (string) $response->getBody();
-        // $response_body = json_decode($response_body, true);
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($islandora_object->deleted);
@@ -50,8 +46,6 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     {
         $islandora_object = new \mjordan\Irc\Object($this->client_defaults);
         $response = $islandora_object->update('islandora:test', array());
-        // $response_body = (string) $response->getBody();
-        // $response_body = json_decode($response_body, true);
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($islandora_object->updated);
