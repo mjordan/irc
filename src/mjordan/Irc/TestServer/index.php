@@ -208,6 +208,28 @@ print <<< END
 END;
 }
 
+function datastream_create()
+{
+    http_response_code(201);
+    header("Content-Type: application/json");
+}
+
+function datastream_delete()
+{
+    http_response_code(200);
+}
+
+function datastream_update()
+{
+    header("Content-Type: application/json");
+
+print <<< END
+{
+ "label": "New MODS DS label"
+}
+END;
+}
+
 function relationship_read()
 {
     header("Content-Type: application/json");
