@@ -2,8 +2,6 @@
 
 PHP library for building clients for Islandora's REST interface, applying a simple pattern of CRUD (Create, Read, Update, Delete) operations to Islandora 7.x objects, relationships, and datastreams. Also provides access to the Islandora REST module's Solr endpoint. The library's goal is to hide the details of intreacting with a REST interface while providing access to the full HTTP responses.
 
-Still in early development. Not for use in production yet. Testers welcome.
-
 ## Requirements
 
 * On the target Islandora instance
@@ -216,7 +214,10 @@ echo "Docs: "; var_dump($solr->docs) . "\n";
 
 ## Development and feedback
 
-Still in development. Once it's past the proof of concept stage, I'd be happy to take PRs, etc.
+* Bug reports, feature requests, and documentation improvements are welcome.
+* If you want to open a pull request, please open an issue first.
+* Run tests with `composer tests`, and run PSR2 style checks with `composer style`.
+* This library includes a simple web server that is used in PHPUnit tests. This server runs by default on port 8001. If you need to change that port number, do so in tests/bootstrap.php.
 
 ## License
 

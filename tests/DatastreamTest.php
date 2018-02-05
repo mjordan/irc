@@ -8,7 +8,8 @@ class DatastreamTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp()
     {
-        $this->server = new TestServer();
+        global $test_server_port;
+        $this->server = new TestServer($test_server_port);
         $this->client_defaults = array(
             'base_uri' => 'http://localhost:8001/islandora/rest/v1/',
         );
@@ -38,6 +39,7 @@ class DatastreamTest extends \PHPUnit\Framework\TestCase
         $this->setExpectedException(\mjordan\Irc\IslandoraRestClientException::class);
         $ds = new \mjordan\Irc\Datastream($this->client_defaults);
         $response = $ds->create('test:pid', 'MODS', '/foo/bar', array('xxx'));
+        $this->assertFalse($ds->created);
     }
 
     public function testDelete()
@@ -61,7 +63,7 @@ class DatastreamTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($ds->propertiesUpdated);
     }
 
-    public function _testUpdateContent()
+    public function testUpdateContent()
     {
         $mods_path = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'TestMODSDocument.xml';
         $ds = new \mjordan\Irc\Datastream($this->client_defaults);
@@ -69,5 +71,13 @@ class DatastreamTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($ds->contentUpdated);
+    }
+
+    public function testUpdateMissingDsFile()
+    {
+        $this->setExpectedException(\mjordan\Irc\IslandoraRestClientException::class);
+        $ds = new \mjordan\Irc\Datastream($this->client_defaults);
+        $response = $ds->update('test:pid', 'MODS', '/foo/bar', array('xxx'));
+        $this->assertFalse($ds->contentUpdated);
     }
 }

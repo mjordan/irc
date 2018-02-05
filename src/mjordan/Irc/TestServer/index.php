@@ -37,7 +37,7 @@ if (preg_match('#/islandora/rest/v1/object/.*/datastream.*#', $request_uri)) {
             datastream_read();
             exit;
         case 'POST':
-            datastream_create();
+            datastream_post($post_data);
             exit;
         case 'PUT':
             datastream_update();
@@ -229,10 +229,14 @@ END;
 /**
  * HTTP response for POST /islandora/rest/v1/object/[PID]/datastream/[DISD].
  */
-function datastream_create()
+function datastream_post($post_data)
 {
-    http_response_code(201);
-    header("Content-Type: application/json");
+    if (array_key_exists('method', $post_data) && $post_data['method'] == 'PUT') {
+        http_response_code(200);
+    } else {
+        http_response_code(201);
+        header("Content-Type: application/json");
+    }
 }
 
 /**
@@ -312,6 +316,6 @@ function dump($variable, $label = null, $destination = null)
     if (!is_null($label)) {
         $value = $label . ":" . PHP_EOL . $value;
     }
-    file_put_contents($destination, $value, FILE_APPEND);
+    file_put_contents($destination, var_export($value, true), FILE_APPEND);
 }
 

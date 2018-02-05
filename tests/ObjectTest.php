@@ -8,7 +8,8 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp()
     {
-        $this->server = new TestServer();
+        global $test_server_port;
+        $this->server = new TestServer($test_server_port);
         $this->client_defaults = array(
             'base_uri' => 'http://localhost:8001/islandora/rest/v1/',
         );
