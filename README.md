@@ -208,6 +208,10 @@ echo "Start: " . $solr->start . "\n";
 echo "Docs: "; var_dump($solr->docs) . "\n";
 ```
 
+## Exceptions
+
+Guzzle `RequestException` and missing datastream file errors are rethrown as `IslandoraRestClientException` exceptions.
+
 ## Maintainer
 
 * [Mark Jordan](https://github.com/mjordan)
@@ -217,7 +221,7 @@ echo "Docs: "; var_dump($solr->docs) . "\n";
 * Bug reports, feature requests, and documentation improvements are welcome.
 * If you want to open a pull request, please open an issue first.
 * Run tests with `composer tests`, and run PSR2 style checks with `composer style`.
-* This library includes a simple web server that is used in PHPUnit tests. This server runs by default on port 8001. If you need to change that port number, do so in tests/bootstrap.php.
+* This library includes a simple web server that is used in PHPUnit tests. This server runs by default on port 8001. If you need to change that port number, do so in `tests/bootstrap.php`.
 
 ## License
 
