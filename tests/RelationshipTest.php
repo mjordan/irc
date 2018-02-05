@@ -17,22 +17,33 @@ class RelationshipTest extends \PHPUnit\Framework\TestCase
     public function testRead()
     {
         $rel = new \mjordan\Irc\Relationship($this->client_defaults);
-        $response = $rel->read('test:pid', array('predicate' => 'hasModel', 'uri' => 'info:fedora/fedora-system:def/model#'));
+        $response = $rel->read('test:pid', array(
+            'predicate' => 'hasModel',
+            'uri' => 'info:fedora/fedora-system:def/model#',
+        ));
         $response_body = (string) $response->getBody();
         $response_body = json_decode($response_body, true);
 
         $this->assertEquals('islandora:sp_basic_image', $response_body[0]['object']['value']);
     }
 
-    public function _testCreate()
+    public function testCreate()
     {
+        $rel = new \mjordan\Irc\Relationship($this->client_defaults);
+        $response = $rel->create('test:pid', array(
+            'predicate' => 'hasModel',
+            'uri' => 'info:fedora/fedora-system:def/model#',
+            'object' => 'islandora:foo',
+        ));
+
+        $this->assertTrue($rel->created);
     }
 
-    public function _testDelete()
+    public function testDelete()
     {
-    }
+        $rel = new \mjordan\Irc\Relationship($this->client_defaults);
+        $response = $rel->delete('test:pid', array());
 
-    public function _testUpdate()
-    {
+        $this->assertTrue($rel->deleted);
     }
 }

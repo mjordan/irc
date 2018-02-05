@@ -98,8 +98,8 @@ class Relationship
      *    -predicate: The predicate URI for the given predicate.
      *    -uri: The predicate of the relationship.
      *    -object: Object of the relationship.
-     *    -literal: The type of the relationship object. Can be either 'uri',
-     *        'string', 'int', 'date', 'none'. Defaults to 'uri'.
+     *    -literal: Optional. The type of the relationship object. Can be one of
+     *        'uri' 'string', 'int', 'date', or 'none'. Defaults to 'uri'.
      *
      * @return object
      *    The Guzzle response.
@@ -110,12 +110,17 @@ class Relationship
             // The base_uri is not being set here automatically as a Guzzle
             // default. The headers are, however, and the base_uri is being
             // set in the object client.
+            if (array_key_exists('type', $params)) {
+                $type = $params['type'];
+            } else {
+                $type = 'uri';
+            }
             $response = $this->client->post($this->clientDefaults['base_uri'] . 'object/' . $pid . '/relationship', [
                 'form_params' => [
                     'uri' => $params['uri'],
                     'predicate' => $params['predicate'],
                     'object' => $params['object'],
-                    'type' => $params['type'],
+                    'type' => $type,
                 ],
                 'headers' => [
                     'Accept' => 'application/json',

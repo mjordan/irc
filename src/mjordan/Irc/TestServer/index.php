@@ -17,7 +17,7 @@ if (preg_match('#/islandora/rest/v1/object/.*/relationship.*#', $request_uri)) {
     switch ($method) {
         case 'GET':
             relationship_read();
-            exit();
+            exit;
         case 'POST':
             relationship_create();
             exit;
@@ -71,6 +71,9 @@ if (preg_match('#/islandora/rest/v1/solr/.*#', $request_uri)) {
     solr_query();
 }
 
+/**
+ * HTTP response for GET /islandora/rest/v1/object/[PID].
+ */
 function object_read()
 {
     header("Content-Type: application/json");
@@ -99,6 +102,9 @@ print <<< END
 END;
 }
 
+/**
+ * HTTP response for POST /islandora/rest/v1/object.
+ */
 function object_create()
 {
     // Necessary, along with flush(), when returning a response code.
@@ -131,6 +137,9 @@ END;
     flush();
 }
 
+/**
+ * HTTP response for DELETE /islandora/rest/v1/object/[PID].
+ */
 function object_delete()
 {
     ob_start();
@@ -138,6 +147,9 @@ function object_delete()
     flush();
 }
 
+/**
+ * HTTP response for PUT /islandora/rest/v1/object/[PID].
+ */
 function object_update()
 {
     header("Content-Type: application/json");
@@ -153,6 +165,9 @@ print <<< END
 END;
 }
 
+/**
+ * HTTP response for GET /islandora/rest/v1/solr.
+ */
 function solr_query()
 {
     header("Content-Type: application/json");
@@ -195,6 +210,9 @@ print <<< END
 END;
 }
 
+/**
+ * HTTP response for GET /islandora/rest/v1/object/[PID]/datastream/[DISD].
+ */
 function datastream_read()
 {
     header("Content-Type: text/xml");
@@ -208,17 +226,26 @@ print <<< END
 END;
 }
 
+/**
+ * HTTP response for POST /islandora/rest/v1/object/[PID]/datastream/[DISD].
+ */
 function datastream_create()
 {
     http_response_code(201);
     header("Content-Type: application/json");
 }
 
+/**
+ * HTTP response for DELETE /islandora/rest/v1/object/[PID]/datastream/[DISD].
+ */
 function datastream_delete()
 {
     http_response_code(200);
 }
 
+/**
+ * HTTP response for PUT /islandora/rest/v1/object/[PID]/datastream/[DISD].
+ */
 function datastream_update()
 {
     header("Content-Type: application/json");
@@ -230,6 +257,9 @@ print <<< END
 END;
 }
 
+/**
+ * HTTP response for GET /islandora/rest/v1/object/[PID]/relationship.
+ */
 function relationship_read()
 {
     header("Content-Type: application/json");
@@ -251,16 +281,37 @@ print <<< END
 END;
 }
 
-// for use during development.
+/**
+ * HTTP response for POST /islandora/rest/v1/object/[PID]/relationship.
+ */
+function relationship_create()
+{
+    http_response_code(201);
+    header("Content-Type: application/json");
+}
+
+/**
+ * HTTP response for DELETE /islandora/rest/v1/object/[PID]/relationship.
+ */
+function relationship_delete()
+{
+    http_response_code(200);
+}
+
+/**
+ * Utility function to write a variable's value to a file.
+ *
+ * For use during development only.
+ */
 function dump($variable, $label = null, $destination = null)
-    {
-        if (is_null($destination)) {
-            $destination = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "irc_test_server_log.txt";
-        }
-        $value = var_export($variable, true) . "\n";
-        if (!is_null($label)) {
-            $value = $label . ":" . PHP_EOL . $value;
-        }
-        file_put_contents($destination, $value, FILE_APPEND);
+{
+    if (is_null($destination)) {
+        $destination = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "irc_test_server_log.txt";
     }
+    $value = var_export($variable, true) . "\n";
+    if (!is_null($label)) {
+        $value = $label . ":" . PHP_EOL . $value;
+    }
+    file_put_contents($destination, $value, FILE_APPEND);
+}
 

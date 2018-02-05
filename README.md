@@ -103,6 +103,8 @@ var_dump($response_body);
 
 ### Relationships
 
+Note that there is no `update()` method for relationships. In order to change a relationship, you need to delete it first, then add a replacement relationship.
+
 ```php
 <?php
 
