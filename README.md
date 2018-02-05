@@ -1,4 +1,4 @@
-# Islandora REST Client
+# Islandora REST Client [![Build Status](https://travis-ci.org/mjordan/irc.svg?branch=master)](https://travis-ci.org/mjordan/irc)
 
 PHP library for building clients for Islandora's REST interface, applying a simple pattern of CRUD (Create, Read, Update, Delete) operations to Islandora 7.x objects, relationships, and datastreams. Also provides access to the Islandora REST module's Solr endpoint. The library's goal is to hide the details of intreacting with a REST interface while providing access to the full HTTP responses.
 
