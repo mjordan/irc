@@ -107,8 +107,6 @@ END;
  */
 function object_create()
 {
-    // Necessary, along with flush(), when returning a response code.
-    ob_start();
     http_response_code(201);
     header("Content-Type: application/json");
 
@@ -134,7 +132,6 @@ print <<< END
  }]
 }
 END;
-    flush();
 }
 
 /**
@@ -142,9 +139,7 @@ END;
  */
 function object_delete()
 {
-    ob_start();
     http_response_code(200);
-    flush();
 }
 
 /**

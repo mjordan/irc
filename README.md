@@ -4,13 +4,13 @@ PHP library for building clients for Islandora's REST interface, applying a simp
 
 ## Requirements
 
-* On the target Islandora instance
+* On the system where REST client applications/scripts are run
+  * PHP 5.5.0 or higher. Tested with PHP 5.5, 5.6, 7.0, 7.1.
+  * [Composer](https://getcomposer.org)
+* On the Islandora instance
   * [Islandora REST](https://github.com/discoverygarden/islandora_rest)
   * Optionally, [Islandora REST Authen](https://github.com/mjordan/islandora_rest_authen)
   * Optionally, [Islandora REST Extras](https://github.com/mjordan/islandora_rest_extras) (see "Generating DC XML" below for more information).
-* On the system where the script is run
-  * PHP 5.5.0 or higher.
-  * [Composer](https://getcomposer.org)
 
 ## Installation
 
@@ -221,7 +221,6 @@ Guzzle `RequestException` and missing datastream file errors are rethrown as `Is
 * Bug reports, feature requests, and documentation improvements are welcome.
 * If you want to open a pull request, please open an issue first.
 * Run tests with `composer tests`, and run PSR2 style checks with `composer style`.
-* This library includes a simple web server that is used in PHPUnit tests. This server runs by default on port 8001. If you need to change that port number, do so in `tests/bootstrap.php`.
 
 ## License
 
