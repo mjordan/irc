@@ -8,10 +8,9 @@ class DatastreamTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp()
     {
-        global $test_server_port;
-        $this->server = new TestServer($test_server_port);
+        $this->server = new TestServer();
         $this->client_defaults = array(
-            'base_uri' => 'http://localhost:8001/islandora/rest/v1/',
+            'base_uri' => 'http://127.0.0.1:8001/islandora/rest/v1/',
         );
     }
 

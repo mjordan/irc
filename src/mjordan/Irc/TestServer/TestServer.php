@@ -14,7 +14,7 @@ class TestServer
      */
     public function __construct($port = '8001')
     {
-        $this->process = new BackgroundProcess('php -S localhost:' . $port . ' ' . __DIR__ . '/index.php');
+        $this->process = new BackgroundProcess('php -S 127.0.0.1:' . $port . ' ' . __DIR__ . '/index.php');
         $this->process->run();
         $this->processId = $this->process->getPid();
         sleep(5);
