@@ -50,7 +50,7 @@ $relationship = new mjordan\Irc\Relationship($client_defaults);
 $object = new mjordan\Irc\Datastream($client_defaults);
 ```
 
-Islandora object and datastreams provide `read()`, `create()`, `delete()`, and `update()` methods; relationships provide `read()`, `create()`, and `delete()` methods. In all cases, these methods returns a Guzzle response object. However, object, relationship, and datastream objects provide convenience propteries that you can use to check the success of the various methods (e.g., `->created`, `-deleted`) are illustrated in the examples below.
+Islandora object and datastreams provide `read()`, `create()`, `delete()`, and `update()` methods; relationships provide `read()`, `create()`, and `delete()` methods. In all cases, these methods returns a Guzzle response object. However, object, relationship, and datastream objects provide convenience propteries that you can use to check the success of the various methods (e.g., `->created`, `->deleted`) are illustrated in the examples below.
 
 ## Authentication
 
@@ -58,7 +58,7 @@ Since you can pass in arbitrary request headers, you can use any authentication 
 
 ## Examples
 
-### Objects
+### Islandora objects
 
 ```php
 <?php
@@ -76,11 +76,12 @@ $object = new mjordan\Irc\Object($client_defaults);
 $response = $object->read('islandora:100');
 
 // Create an object. When we create a new object, we can optionally assign a content
-// model and parent. Newly created objects have a pid property, e.g., $object->pid,
-// which can be used to add relationships or datastreams.
+// model and parent. 
 $response = $object->create('islandora', 'admin', "My new object", "islandora:sp_basic_image", "islandora:testcollection");
 // True if successfully created, false if not.
 var_dump($object->created);
+// You can also access the new object's PID.
+var_dump($object->pid);
 
 // Update an object.
 $response = $object->update('islandora:150', array('owner' => 'mark'));
@@ -126,7 +127,7 @@ $params = array(
 );
 
 $rel = new Relationship($this->clientDefaults);
-$response->create('islandora:456', $params);
+$response = $rel->create('islandora:456', $params);
 // True if successfully created, false if not.
 var_dump($rel->created);
 
