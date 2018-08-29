@@ -41,7 +41,7 @@ Islandora objects, relationships, and datastreams are instantiated using a set o
 include 'vendor/autoload.php';
 
 $client_defaults = array(
-    'base_uri' => 'ihttp://localhost:8000/islandora/rest/v1/',
+    'base_uri' => 'http://localhost:8000/islandora/rest/v1/',
     'headers' => array('X-Authorization-User' => 'admin:admin'),
 );
 
