@@ -45,7 +45,7 @@ $client_defaults = array(
     'headers' => array('X-Authorization-User' => 'admin:admin'),
 );
 
-$islandora_object = new mjordan\Irc\Object($client_defaults);
+$islandora_object = new mjordan\Irc\IslandoraObject($client_defaults);
 $relationship = new mjordan\Irc\Relationship($client_defaults);
 $object = new mjordan\Irc\Datastream($client_defaults);
 ```

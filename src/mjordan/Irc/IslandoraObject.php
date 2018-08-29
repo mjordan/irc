@@ -8,7 +8,7 @@ use GuzzleHttp\Exception\RequestException;
 /**
  * Islandora REST Client Object base class.
  */
-class Object
+class IslandoraObject
 {
     /**
      * @var array

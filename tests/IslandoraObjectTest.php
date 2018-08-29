@@ -4,7 +4,7 @@ namespace mjordan\irc;
 
 use mjordan\Irc\TestServer\TestServer;
 
-class ObjectTest extends \PHPUnit\Framework\TestCase
+class IslandoraObjectTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp()
     {
@@ -16,7 +16,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testRead()
     {
-        $islandora_object = new \mjordan\Irc\Object($this->client_defaults);
+        $islandora_object = new \mjordan\Irc\IslandoraObject($this->client_defaults);
         $response = $islandora_object->read('test:pid');
         $response_body = (string) $response->getBody();
         $response_body = json_decode($response_body, true);
@@ -26,7 +26,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testCreate()
     {
-        $islandora_object = new \mjordan\Irc\Object($this->client_defaults);
+        $islandora_object = new \mjordan\Irc\IslandoraObject($this->client_defaults);
         $response = $islandora_object->create('test', 'admin', 'A label');
 
         $this->assertEquals(201, $response->getStatusCode());
@@ -35,7 +35,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testDelete()
     {
-        $islandora_object = new \mjordan\Irc\Object($this->client_defaults);
+        $islandora_object = new \mjordan\Irc\IslandoraObject($this->client_defaults);
         $response = $islandora_object->delete('islandora:test');
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -44,7 +44,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testUpdate()
     {
-        $islandora_object = new \mjordan\Irc\Object($this->client_defaults);
+        $islandora_object = new \mjordan\Irc\IslandoraObject($this->client_defaults);
         $response = $islandora_object->update('islandora:test', array());
 
         $this->assertEquals(200, $response->getStatusCode());
