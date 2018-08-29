@@ -70,7 +70,7 @@ $client_defaults = array(
     'headers' => array('X-Authorization-User' => 'admin:admin'),
 );
 
-$object = new mjordan\Irc\Object($client_defaults);
+$object = new mjordan\Irc\IslandoraObject($client_defaults);
 
 // Read an object. CRUD methods on objects return a Guzzle response object.
 $response = $object->read('islandora:100');
